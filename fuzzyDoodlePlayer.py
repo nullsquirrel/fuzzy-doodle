@@ -5,9 +5,10 @@ from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QLabel, QGridLayout,
                              QSizePolicy)
 from PyQt5.QtCore import QDir, QSize
 from PyQt5.QtGui import QPixmap, QImage
+from imageScaleWidget import ImageScaleWidget
 
 
-class SlideshowWindow(QMainWindow):
+class FuzzyDoodlePlayer(QMainWindow):
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -40,7 +41,7 @@ class SlideshowWindow(QMainWindow):
         self.initBodyButtons()
 
         # Add widgets to layout
-        gridLayout.addWidget(self.mainPictureLabel, 0, 0)
+        gridLayout.addWidget(self.mainPictureWidget, 0, 0)
         gridLayout.addWidget(self.titleLabel, 1, 0)
         gridLayout.addLayout(self.buttonLayout, 2, 0)
 
@@ -52,12 +53,12 @@ class SlideshowWindow(QMainWindow):
         self.titleLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         # Create main image label
-        self.mainPictureLabel = QLabel(self)
+        self.mainPictureWidget = ImageScaleWidget(self)
         self.mainPicturePixmap = QPixmap()
-        self.mainPictureLabel.setPixmap(self.mainPicturePixmap)
-        self.mainPictureLabel.scaleFactor = 1.0
-        self.mainPictureLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.mainPictureLabel.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+        self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
+        self.mainPictureWidget.scaleFactor = 1.0
+        self.mainPictureWidget.setAlignment(QtCore.Qt.AlignCenter)
+        self.mainPictureWidget.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
 
 
     def initBodyButtons(self):
@@ -121,20 +122,20 @@ class SlideshowWindow(QMainWindow):
                 + str(self.mainPicturePixmap.height()))
 
         print('PictureLabel.size: '
-                + str(self.mainPictureLabel.width())
+                + str(self.mainPictureWidget.width())
                 + ' x '
-                + str(self.mainPictureLabel.height()))
+                + str(self.mainPictureWidget.height()))
 
-        self.mainPictureLabel.setPixmap(self.mainPicturePixmap.scaled(self.mainPictureLabel.size(), QtCore.Qt.KeepAspectRatio))
+        self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
         self.titleLabel.setText(self.imageFilename)
 
 
     def nextButtonAction(self):
-        self.mainPictureLabel.clear()
+        self.mainPictureWidget.clear()
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    mainWin = SlideshowWindow()
+    mainWin = FuzzyDoodlePlayer()
     mainWin.show()
     sys.exit(app.exec_())
