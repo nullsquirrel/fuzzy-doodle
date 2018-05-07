@@ -25,7 +25,10 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.statusBar().showMessage('Ready!')
 
     def initWindow(self):
-        self.setMinimumSize(QSize(320, 240))
+        requestedSize = QSize(self.screenGeometry.width()*2/3,
+                                self.screenGeometry.height()*2/3)
+        self.setMinimumSize(320, 240)
+        self.resize(requestedSize)
         self.setWindowTitle('Fuzzy Doodle Sketch Practice')
 
 
@@ -58,7 +61,6 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
         self.mainPictureWidget.scaleFactor = 1.0
         self.mainPictureWidget.setAlignment(QtCore.Qt.AlignCenter)
-        self.mainPictureWidget.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
 
 
     def initBodyButtons(self):
@@ -96,6 +98,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         openAction = QAction('Open', self)
         openAction.triggered.connect(self.openFile)
         openAction.setStatusTip('Open File')
+        openAction.setShortcut('Ctrl+O')
 
         quitAction = QAction('Quit', self)
         quitAction.triggered.connect(self.close)
