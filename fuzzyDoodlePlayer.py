@@ -53,10 +53,11 @@ class SlideshowWindow(QMainWindow):
 
         # Create main image label
         self.mainPictureLabel = QLabel(self)
+        self.mainPicturePixmap = QPixmap()
+        self.mainPictureLabel.setPixmap(self.mainPicturePixmap)
         self.mainPictureLabel.scaleFactor = 1.0
         self.mainPictureLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.mainPictureLabel.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
-        self.mainPictureLabel.setScaledContents(True)
 
 
     def initBodyButtons(self):
@@ -112,7 +113,19 @@ class SlideshowWindow(QMainWindow):
             self, 'Open File', QDir.currentPath())
 
         image = QImage(self.imageFilename)
-        self.mainPictureLabel.setPixmap(QPixmap.fromImage(image))
+        self.mainPicturePixmap.convertFromImage(image)
+
+        print('PicturePixmap.size: '
+                + str(self.mainPicturePixmap.width())
+                + ' x '
+                + str(self.mainPicturePixmap.height()))
+
+        print('PictureLabel.size: '
+                + str(self.mainPictureLabel.width())
+                + ' x '
+                + str(self.mainPictureLabel.height()))
+
+        self.mainPictureLabel.setPixmap(self.mainPicturePixmap.scaled(self.mainPictureLabel.size(), QtCore.Qt.KeepAspectRatio))
         self.titleLabel.setText(self.imageFilename)
 
 
