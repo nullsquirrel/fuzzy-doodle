@@ -138,14 +138,14 @@ class FuzzyDoodlePlayer(QMainWindow):
         menubar.setNativeMenuBar(False)
 
         # Initialize File menu components
-        openAction = QAction('Open', self)
-        openAction.triggered.connect(self.openFile)
-        openAction.setStatusTip('Open File')
-        openAction.setShortcut('Ctrl+O')
+        importAction = QAction('Import', self)
+        importAction.triggered.connect(self.importFile)
+        importAction.setStatusTip('Import File')
+        importAction.setShortcut('Ctrl+O')
 
-        openDirAction = QAction('Open Dir', self)
-        openDirAction.triggered.connect(self.openDir)
-        openDirAction.setStatusTip('Open Directory')
+        importDirAction = QAction('Import Dir', self)
+        importDirAction.triggered.connect(self.importDir)
+        importDirAction.setStatusTip('Import Directory')
 
         quitAction = QAction('Quit', self)
         quitAction.triggered.connect(self.close)
@@ -154,25 +154,22 @@ class FuzzyDoodlePlayer(QMainWindow):
 
         # Build file menu
         fileMenu = menubar.addMenu('File')
-        fileMenu.addAction(openAction)
-        fileMenu.addAction(openDirAction)
+        fileMenu.addAction(importAction)
+        fileMenu.addAction(importDirAction)
         fileMenu.addSeparator()
         fileMenu.addAction(quitAction)
 
-    def openDir(self):
+    def importDir(self):
         dirName = QFileDialog.getExistingDirectory(self, 'Open Directory', QDir.currentPath())
 
         print('dirName: ' + dirName)
 
-        if dirName != '':
-            for file in os.listdir(dirName):
-                file = os.path.join(dirName, file)
-                self.imageList.addImage(file)
+        self.imageList.appendDirectory(dirName)
 
         print(self.imageList)
 
 
-    def openFile(self):
+    def importFile(self):
         imageFile, _ = QFileDialog.getOpenFileName(
             self, 'Open File', QDir.currentPath())
 

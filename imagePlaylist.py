@@ -22,6 +22,11 @@ class ImagePlaylist:
         for image in imageList:
             self.addImage(image)
 
+    def appendDirectory(self, directory):
+        if directory != '':
+            fileList = [os.path.join(directory, file) for file in os.listdir(directory)]
+            self.addImages(fileList)
+
     def removeImage(self, index):
         self.__imageList.pop(index)
 
@@ -41,6 +46,9 @@ class ImagePlaylist:
 
     def __getitem__(self, index):
         return self.getImage(index)
+
+    def __delitem__(self, index):
+        del self.__imageList[index]
 
     def __len__(self):
         return len(self.__imageList)
