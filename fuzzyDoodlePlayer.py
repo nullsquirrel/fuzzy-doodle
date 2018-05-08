@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QLabel, QGridLayout,
 from PyQt5.QtCore import QDir, QSize
 from PyQt5.QtGui import QPixmap, QImage
 from imageScaleWidget import ImageScaleWidget
+from imagePlaylist import ImagePlaylist
 
 
 class FuzzyDoodlePlayer(QMainWindow):
@@ -13,7 +14,7 @@ class FuzzyDoodlePlayer(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.imageList = []
+        self.imageList = ImagePlaylist()
         self.imageIndex = -1
         self.playState = False
 
@@ -159,17 +160,14 @@ class FuzzyDoodlePlayer(QMainWindow):
         fileMenu.addAction(quitAction)
 
     def openDir(self):
-        supportExt = ['.jpg', '.jpeg', '.png', '.tiff']
         dirName = QFileDialog.getExistingDirectory(self, 'Open Directory', QDir.currentPath())
 
         print('dirName: ' + dirName)
 
         if dirName != '':
-            self.imageList = []
             for file in os.listdir(dirName):
                 file = os.path.join(dirName, file)
-                if (os.path.isfile(file) and file.endswith(tuple(supportExt))):
-                    self.imageList.append(file)
+                self.imageList.addImage(file)
 
         print(self.imageList)
 
@@ -178,7 +176,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         imageFile, _ = QFileDialog.getOpenFileName(
             self, 'Open File', QDir.currentPath())
 
-        self.imageList = [imageFile]
+        self.imageList.addImage(imageFile)
 
 
     def loadImage(self, imageFile):
