@@ -1,13 +1,18 @@
 import sys, os
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QLabel, QGridLayout,
-                             QWidget, QAction, QPushButton, QHBoxLayout,
-                             QSizePolicy)
+                             QAction, QHBoxLayout,
+                             QPushButton, QSizePolicy, QWidget)
 from PyQt5.QtCore import QDir, QSize
 from PyQt5.QtGui import QPixmap, QImage
-from imageScaleWidget import ImageScaleWidget
-from imagePlaylist import ImagePlaylist
+from ImageScaleWidget import ImageScaleWidget
+from ImagePlaylist import ImagePlaylist
 
+
+playerStyle = {'darkgray': '''
+    QMainWindow { background-color: darkgray; }
+    '''
+}
 
 class FuzzyDoodlePlayer(QMainWindow):
 
@@ -17,6 +22,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.imageList = ImagePlaylist()
         self.imageIndex = -1
         self.playState = False
+        self.setStyleSheet(playerStyle['darkgray'])
 
         # Initialize GUI
         self.initWindow()
@@ -31,7 +37,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
         requestedSize = QSize(screenGeometry.width()*2/3,
                                 screenGeometry.height()*2/3)
-        self.setMinimumSize(320, 240)
+        self.setMinimumSize(320, 320)
         self.resize(requestedSize)
         self.setWindowTitle('Fuzzy Doodle Sketch Practice')
 
@@ -73,6 +79,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.backButton.setToolTip('Go to previous image')
         self.backButton.clicked.connect(self.backButtonAction)
         self.backButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.backButton.setEnabled(False)
 
         # Create pause/play button
         self.playPauseButton = QPushButton('Play', self)
@@ -85,6 +92,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.nextButton.setToolTip('Go to next image')
         self.nextButton.clicked.connect(self.nextButtonAction)
         self.nextButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.nextButton.setEnabled(False)
 
         # Create button widget
         self.buttonLayout = QHBoxLayout(self)
@@ -92,17 +100,6 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.buttonLayout.addWidget(self.playPauseButton)
         self.buttonLayout.addWidget(self.nextButton)
 
-    def backButtonAction(self):
-        imageCount = len(self.imageList)
-        if imageCount <= 0 or self.playState == False:
-            return
-
-        nextImage = self.imageIndex - 1
-        nextImage %= imageCount
-
-        if nextImage != self.imageIndex:
-            self.loadImage(self.imageList[nextImage])
-            self.imageIndex = nextImage
 
     def playPauseButtonAction(self):
         imageCount = len(self.imageList)
@@ -115,8 +112,43 @@ class FuzzyDoodlePlayer(QMainWindow):
             self.playPauseButton.setText('Pause')
             self.imageIndex = 0
             self.loadImage(self.imageList[self.imageIndex])
+
+            self.backButton.setEnabled(True)
+            self.nextButton.setEnabled(True)
         else:
             self.playPauseButton.setText('Play')
+            self.backButton.setEnabled(False)
+            self.nextButton.setEnabled(False)
+
+
+    def loadImage(self, imageFile):
+        image = QImage(imageFile)
+        self.mainPicturePixmap.convertFromImage(image)
+
+        print('PicturePixmap.size: '
+                + str(self.mainPicturePixmap.width())
+                + ' x '
+                + str(self.mainPicturePixmap.height()))
+
+        print('PictureLabel.size: '
+                + str(self.mainPictureWidget.width())
+                + ' x '
+                + str(self.mainPictureWidget.height()))
+
+        self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
+        self.titleLabel.setText(imageFile)
+
+    def backButtonAction(self):
+        imageCount = len(self.imageList)
+        if imageCount <= 0 or self.playState == False:
+            return
+
+        nextImage = self.imageIndex - 1
+        nextImage %= imageCount
+
+        if nextImage != self.imageIndex:
+            self.loadImage(self.imageList[nextImage])
+            self.imageIndex = nextImage
 
 
     def nextButtonAction(self):
@@ -176,22 +208,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.imageList.addImage(imageFile)
 
 
-    def loadImage(self, imageFile):
-        image = QImage(imageFile)
-        self.mainPicturePixmap.convertFromImage(image)
 
-        print('PicturePixmap.size: '
-                + str(self.mainPicturePixmap.width())
-                + ' x '
-                + str(self.mainPicturePixmap.height()))
-
-        print('PictureLabel.size: '
-                + str(self.mainPictureWidget.width())
-                + ' x '
-                + str(self.mainPictureWidget.height()))
-
-        self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
-        self.titleLabel.setText(imageFile)
 
 
 if __name__ == '__main__':
