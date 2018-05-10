@@ -114,12 +114,14 @@ class FuzzyDoodlePlayer(QMainWindow):
 
         if self.playState:
             self.playPauseButton.setText('Pause')
-            self.backButton.setEnabled(True)
             self.nextButton.setEnabled(True)
+            hasHistory = self.imageList.hasHistory()
+            self.backButton.setEnabled(hasHistory)
+
             self.mainPictureWidget.enableBlurFade(False)
 
             if (self.playState == False and len(self.imageList) > 0):
-                self.loadImage(self.imageList[self.imageIndex])
+                self.loadImage(self.imageList.getImage())
                 self.playState = True
         else:
             self.playPauseButton.setText('Play')
@@ -146,29 +148,23 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.titleLabel.setText(imageFile)
 
     def backButtonAction(self):
-        imageCount = len(self.imageList)
-        if imageCount <= 0 or self.playState == False:
+        if len(self.imageList) <= 0 or self.playState == False:
             return
 
-        nextImage = self.imageIndex - 1
-        nextImage %= imageCount
+        self.loadImage(self.imageList.getPrevImage())
 
-        if nextImage != self.imageIndex:
-            self.loadImage(self.imageList[nextImage])
-            self.imageIndex = nextImage
+        hasHistory = self.imageList.hasHistory()
+        self.backButton.setEnabled(hasHistory)
 
 
     def nextButtonAction(self):
-        imageCount = len(self.imageList)
-        if imageCount <= 0 or self.playState == False:
+        if len(self.imageList) <= 0 or self.playState == False:
             return
 
-        nextImage = self.imageIndex + 1
-        nextImage %= imageCount
-
-        if nextImage != self.imageIndex:
-            self.loadImage(self.imageList[nextImage])
-            self.imageIndex = nextImage
+        self.loadImage(self.imageList.getNextImage())
+        
+        hasHistory = self.imageList.hasHistory()
+        self.backButton.setEnabled(hasHistory)
 
 
     def initMenuBar(self):
@@ -207,7 +203,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         imported = self.imageList.appendDirectory(dirName)
         if len(self.imageList) > 0:
             self.playPauseButton.setEnabled(True)
-            self.loadImage(self.imageList[self.imageIndex])
+            self.loadImage(self.imageList.getImage())
             self.statusBar.showMessage('Imported {0} images'.format(imported))
 
         print(self.imageList)
@@ -221,7 +217,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         imported = self.imageList.appendImage(imageFile)
         if len(self.imageList) > 0:
             self.playPauseButton.setEnabled(True)
-            self.loadImage(self.imageList[self.imageIndex])
+            self.loadImage(self.imageList.getImage())
             self.statusBar.showMessage('Imported {0} images'.format(imported))
 
         print(self.imageList)
