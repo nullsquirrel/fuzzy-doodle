@@ -11,24 +11,36 @@ class ImagePlaylist:
 
     # def saveImagePlayList(self, imageListFile)
 
-    def addImages(self, imageList):
+    def appendImages(self, imageList):
         for image in imageList:
-            self.addImage(image)
+            additions = 0
+            additions += self.appendImage(image)
+        return additions
 
-    def addImage(self, image):
+    def appendImage(self, image):
         if os.path.isfile(image):
             dir, file = os.path.split(image)
-            self.__appendImageFile(dir, file)
+            additions = self.__appendImageFile(dir, file)
+            return additions
+        else:
+            return 0
 
     def __appendImageFile(self, dir, file):
         entry = (dir, file)
         if (file.endswith(tuple(self.supportedExtensions)) and entry not in self.__imageList) :
             self.__imageList.append(entry)
+            return 1
+        else:
+            return 0
 
     def appendDirectory(self, dir):
         if (dir != '' and os.path.isdir(dir)):
+            additions = 0
             for file in os.listdir(dir):
-                self.__appendImageFile(dir, file)
+                additions += self.__appendImageFile(dir, file)
+            return additions
+        else:
+            return 0
 
     def removeImage(self, image):
         if image is int:
@@ -43,12 +55,12 @@ class ImagePlaylist:
         for index in indicies:
             self.removeImage(index)
 
-    def shuffleImages(self):
+    def shuffleList(self):
         imgListLen = len(self.__imageList)
         self.__shuffledPlayList = random.sample(range(imgListLen), imgListLen)
 
-    def getShuffledImage(self, index):
-        return self.__shuffledImageList[self.__shuffledPlayList[index % len(self.__imageList)]]
+    def getRandomImage(self, index):
+        return self.__imageList[self.__shuffledPlayList[index % len(self.__imageList)]]
 
     def getImage(self, index):
         entry = self.__imageList[index]

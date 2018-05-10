@@ -19,18 +19,21 @@ class FuzzyDoodlePlayer(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.imageList = ImagePlaylist()
-        self.imageIndex = 0
-        self.playState = False
         self.setStyleSheet(playerStyle['darkgray'])
+        self.statusBar = self.statusBar()
 
         # Initialize GUI
         self.initWindow()
         self.initMenuBar()
         self.initBody()
 
+        # Initialize player features
+        self.imageList = ImagePlaylist()
+        self.imageIndex = 0
+        self.playState = False
+
         # Inform user that we're ready for use
-        self.statusBar().showMessage('Ready!')
+        self.statusBar.showMessage('Ready!')
 
 
     def initWindow(self):
@@ -201,10 +204,11 @@ class FuzzyDoodlePlayer(QMainWindow):
 
         print('dirName: ' + dirName)
 
-        self.imageList.appendDirectory(dirName)
+        imported = self.imageList.appendDirectory(dirName)
         if len(self.imageList) > 0:
             self.playPauseButton.setEnabled(True)
-            self.loadImage(self.imageList[-1])
+            self.loadImage(self.imageList[self.imageIndex])
+            self.statusBar.showMessage('Imported {0} images'.format(imported))
 
         print(self.imageList)
 
@@ -214,10 +218,11 @@ class FuzzyDoodlePlayer(QMainWindow):
         imageFile, _ = QFileDialog.getOpenFileName(
             self, 'Open File', QDir.currentPath())
 
-        self.imageList.addImage(imageFile)
+        imported = self.imageList.appendImage(imageFile)
         if len(self.imageList) > 0:
             self.playPauseButton.setEnabled(True)
-            self.loadImage(self.imageList[-1])
+            self.loadImage(self.imageList[self.imageIndex])
+            self.statusBar.showMessage('Imported {0} images'.format(imported))
 
         print(self.imageList)
 
