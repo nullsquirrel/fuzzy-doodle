@@ -1,4 +1,4 @@
-import sys, os
+import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QLabel, QGridLayout,
                              QAction, QHBoxLayout,
@@ -20,7 +20,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         QMainWindow.__init__(self)
 
         self.imageList = ImagePlaylist()
-        self.imageIndex = -1
+        self.imageIndex = 0
         self.playState = False
         self.setStyleSheet(playerStyle['darkgray'])
 
@@ -86,6 +86,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.playPauseButton.setToolTip('Start/continue practice session')
         self.playPauseButton.clicked.connect(self.playPauseButtonAction)
         self.playPauseButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.playPauseButton.setEnabled(False)
 
         # Create next button
         self.nextButton = QPushButton('Next', self)
@@ -110,15 +111,18 @@ class FuzzyDoodlePlayer(QMainWindow):
 
         if self.playState:
             self.playPauseButton.setText('Pause')
-            self.imageIndex = 0
-            self.loadImage(self.imageList[self.imageIndex])
-
             self.backButton.setEnabled(True)
             self.nextButton.setEnabled(True)
+            self.mainPictureWidget.enableBlurFade(False)
+
+            if (self.playState == False and len(self.imageList) > 0):
+                self.loadImage(self.imageList[self.imageIndex])
+                self.playState = True
         else:
             self.playPauseButton.setText('Play')
             self.backButton.setEnabled(False)
             self.nextButton.setEnabled(False)
+            self.mainPictureWidget.enableBlurFade(True)
 
 
     def loadImage(self, imageFile):
@@ -191,14 +195,19 @@ class FuzzyDoodlePlayer(QMainWindow):
         fileMenu.addSeparator()
         fileMenu.addAction(quitAction)
 
+
     def importDir(self):
         dirName = QFileDialog.getExistingDirectory(self, 'Open Directory', QDir.currentPath())
 
         print('dirName: ' + dirName)
 
         self.imageList.appendDirectory(dirName)
+        if len(self.imageList) > 0:
+            self.playPauseButton.setEnabled(True)
+            self.loadImage(self.imageList[-1])
 
         print(self.imageList)
+
 
 
     def importFile(self):
@@ -206,6 +215,11 @@ class FuzzyDoodlePlayer(QMainWindow):
             self, 'Open File', QDir.currentPath())
 
         self.imageList.addImage(imageFile)
+        if len(self.imageList) > 0:
+            self.playPauseButton.setEnabled(True)
+            self.loadImage(self.imageList[-1])
+
+        print(self.imageList)
 
 
 
