@@ -7,6 +7,7 @@ from PyQt5.QtCore import QDir, QSize
 from PyQt5.QtGui import QPixmap, QImage
 from ImageScaleWidget import ImageScaleWidget
 from ImagePlaylist import ImagePlaylist
+from FuzzyDoodleUi import FuzzyDoodleUi
 
 
 playerStyle = {'darkgray': '''
@@ -14,95 +15,28 @@ playerStyle = {'darkgray': '''
     '''
 }
 
-class FuzzyDoodlePlayer(QMainWindow):
+class FuzzyDoodlePlayer:
 
     def __init__(self):
-        QMainWindow.__init__(self)
-
-        self.setStyleSheet(playerStyle['darkgray'])
-        self.statusBar = self.statusBar()
-
-        # Initialize GUI
-        self.initWindow()
-        self.initMenuBar()
-        self.initBody()
+        self.ui = FuzzyDoodleUi()
+        self.initUi()
 
         # Initialize player features
         self.imageList = ImagePlaylist()
-        self.imageIndex = 0
         self.playState = False
 
         # Inform user that we're ready for use
-        self.statusBar.showMessage('Ready!')
+        self.ui.statusBar.showMessage('Ready!')
 
+    def initUi(self):
+        self.ui.setStyleSheet(playerStyle['darkgray'])
 
-    def initWindow(self):
-        screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
-        requestedSize = QSize(screenGeometry.width()*2/3,
-                                screenGeometry.height()*2/3)
-        self.setMinimumSize(320, 320)
-        self.resize(requestedSize)
-        self.setWindowTitle('Fuzzy Doodle Sketch Practice')
+        self.ui.playPauseButton.clicked.connect(self.playPauseButtonAction)
+        self.ui.backButton.clicked.connect(self.backButtonAction)
+        self.ui.nextButton.clicked.connect(self.nextButtonAction)
 
-
-    def initBody(self):
-        # Setup central grid layout
-        centralWidget = QWidget(self)
-        self.setCentralWidget(centralWidget)
-
-        gridLayout = QGridLayout(self)
-        centralWidget.setLayout(gridLayout)
-
-        self.initPictureFrame()
-        self.initBodyButtons()
-
-        # Add widgets to layout
-        gridLayout.addWidget(self.mainPictureWidget, 0, 0)
-        gridLayout.addWidget(self.titleLabel, 1, 0)
-        gridLayout.addLayout(self.buttonLayout, 2, 0)
-
-
-    def initPictureFrame(self):
-        # Create Title Label
-        self.titleLabel = QLabel('Fuzzy Doodle Sketch Practice', self)
-        self.titleLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.titleLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-
-        # Create main image label
-        self.mainPictureWidget = ImageScaleWidget(self)
-        self.mainPicturePixmap = QPixmap()
-        self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
-        self.mainPictureWidget.scaleFactor = 1.0
-        self.mainPictureWidget.setAlignment(QtCore.Qt.AlignCenter)
-
-
-    def initBodyButtons(self):
-        # Create back button
-        self.backButton = QPushButton('Back', self)
-        self.backButton.setToolTip('Go to previous image')
-        self.backButton.clicked.connect(self.backButtonAction)
-        self.backButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.backButton.setEnabled(False)
-
-        # Create pause/play button
-        self.playPauseButton = QPushButton('Play', self)
-        self.playPauseButton.setToolTip('Start/continue practice session')
-        self.playPauseButton.clicked.connect(self.playPauseButtonAction)
-        self.playPauseButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.playPauseButton.setEnabled(False)
-
-        # Create next button
-        self.nextButton = QPushButton('Next', self)
-        self.nextButton.setToolTip('Go to next image')
-        self.nextButton.clicked.connect(self.nextButtonAction)
-        self.nextButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.nextButton.setEnabled(False)
-
-        # Create button widget
-        self.buttonLayout = QHBoxLayout(self)
-        self.buttonLayout.addWidget(self.backButton)
-        self.buttonLayout.addWidget(self.playPauseButton)
-        self.buttonLayout.addWidget(self.nextButton)
+        self.ui.importAction.triggered.connect(self.importFile)
+        self.ui.importDirAction.triggered.connect(self.importDir)
 
 
     def playPauseButtonAction(self):
@@ -113,39 +47,39 @@ class FuzzyDoodlePlayer(QMainWindow):
             self.playState = False
 
         if self.playState:
-            self.playPauseButton.setText('Pause')
-            self.nextButton.setEnabled(True)
-            hasHistory = self.imageList.hasHistory()
-            self.backButton.setEnabled(hasHistory)
+            self.ui.playPauseButton.setText('Pause')
+            self.ui.nextButton.setEnabled(imageCount > 1)
+            self.ui.backButton.setEnabled(self.imageList.hasHistory())
 
-            self.mainPictureWidget.enableBlurFade(False)
+            self.ui.mainPictureWidget.enableBlurFade(False)
 
-            if (self.playState == False and len(self.imageList) > 0):
+            if self.playState == False:
                 self.loadImage(self.imageList.getImage())
                 self.playState = True
         else:
-            self.playPauseButton.setText('Play')
-            self.backButton.setEnabled(False)
-            self.nextButton.setEnabled(False)
-            self.mainPictureWidget.enableBlurFade(True)
+            self.ui.playPauseButton.setText('Play')
+            self.ui.backButton.setEnabled(False)
+            self.ui.nextButton.setEnabled(False)
+            self.ui.mainPictureWidget.enableBlurFade(True)
 
 
     def loadImage(self, imageFile):
         image = QImage(imageFile)
-        self.mainPicturePixmap.convertFromImage(image)
+        self.ui.mainPicturePixmap.convertFromImage(image)
 
         print('PicturePixmap.size: '
-                + str(self.mainPicturePixmap.width())
+                + str(self.ui.mainPicturePixmap.width())
                 + ' x '
-                + str(self.mainPicturePixmap.height()))
+                + str(self.ui.mainPicturePixmap.height()))
 
         print('PictureLabel.size: '
-                + str(self.mainPictureWidget.width())
+                + str(self.ui.mainPictureWidget.width())
                 + ' x '
-                + str(self.mainPictureWidget.height()))
+                + str(self.ui.mainPictureWidget.height()))
 
-        self.mainPictureWidget.setPixmap(self.mainPicturePixmap)
-        self.titleLabel.setText(imageFile)
+        self.ui.mainPictureWidget.setPixmap(self.ui.mainPicturePixmap)
+        self.ui.titleLabel.setText(imageFile)
+
 
     def backButtonAction(self):
         if len(self.imageList) <= 0 or self.playState == False:
@@ -154,7 +88,7 @@ class FuzzyDoodlePlayer(QMainWindow):
         self.loadImage(self.imageList.getPrevImage())
 
         hasHistory = self.imageList.hasHistory()
-        self.backButton.setEnabled(hasHistory)
+        self.ui.backButton.setEnabled(hasHistory)
 
 
     def nextButtonAction(self):
@@ -162,65 +96,47 @@ class FuzzyDoodlePlayer(QMainWindow):
             return
 
         self.loadImage(self.imageList.getNextImage())
-        
+
         hasHistory = self.imageList.hasHistory()
-        self.backButton.setEnabled(hasHistory)
-
-
-    def initMenuBar(self):
-        # Initialize menu bar
-        menubar = self.menuBar()
-        menubar.setNativeMenuBar(False)
-
-        # Initialize File menu components
-        importAction = QAction('Import', self)
-        importAction.triggered.connect(self.importFile)
-        importAction.setStatusTip('Import File')
-        importAction.setShortcut('Ctrl+O')
-
-        importDirAction = QAction('Import Dir', self)
-        importDirAction.triggered.connect(self.importDir)
-        importDirAction.setStatusTip('Import Directory')
-
-        quitAction = QAction('Quit', self)
-        quitAction.triggered.connect(self.close)
-        quitAction.setStatusTip('Quit Application')
-        quitAction.setShortcut('Ctrl+Q')
-
-        # Build file menu
-        fileMenu = menubar.addMenu('File')
-        fileMenu.addAction(importAction)
-        fileMenu.addAction(importDirAction)
-        fileMenu.addSeparator()
-        fileMenu.addAction(quitAction)
+        self.ui.backButton.setEnabled(hasHistory)
 
 
     def importDir(self):
-        dirName = QFileDialog.getExistingDirectory(self, 'Open Directory', QDir.currentPath())
+        dirName = QFileDialog.getExistingDirectory(
+            self.ui, 'Open Directory', QDir.currentPath())
 
         print('dirName: ' + dirName)
 
         imported = self.imageList.appendDirectory(dirName)
+        self.dispImportMsg(imported)
+
         if len(self.imageList) > 0:
-            self.playPauseButton.setEnabled(True)
+            self.ui.playPauseButton.setEnabled(True)
             self.loadImage(self.imageList.getImage())
-            self.statusBar.showMessage('Imported {0} images'.format(imported))
 
         print(self.imageList)
-
 
 
     def importFile(self):
         imageFile, _ = QFileDialog.getOpenFileName(
-            self, 'Open File', QDir.currentPath())
+            self.ui, 'Open File', QDir.currentPath())
 
         imported = self.imageList.appendImage(imageFile)
+        self.dispImportMsg(imported)
+
         if len(self.imageList) > 0:
-            self.playPauseButton.setEnabled(True)
+            self.ui.playPauseButton.setEnabled(True)
             self.loadImage(self.imageList.getImage())
-            self.statusBar.showMessage('Imported {0} images'.format(imported))
 
         print(self.imageList)
+
+
+    def dispImportMsg(self, count):
+        if count > 0:
+            importMsg = 'Imported {0} images'.format(count)
+        else:
+            importMsg = 'No images imported.'
+        self.ui.statusBar.showMessage(importMsg)
 
 
 
@@ -229,5 +145,5 @@ class FuzzyDoodlePlayer(QMainWindow):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     mainWin = FuzzyDoodlePlayer()
-    mainWin.show()
+    mainWin.ui.show()
     sys.exit(app.exec_())
