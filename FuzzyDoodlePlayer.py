@@ -1,19 +1,14 @@
-import sys
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QLabel, QGridLayout,
-                             QAction, QHBoxLayout,
-                             QPushButton, QSizePolicy, QWidget)
-from PyQt5.QtCore import QDir, QSize
-from PyQt5.QtGui import QPixmap, QImage
-from ImageScaleWidget import ImageScaleWidget
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtCore import QDir
+from PyQt5.QtGui import QImage
 from ImagePlaylist import ImagePlaylist
 from FuzzyDoodleUi import FuzzyDoodleUi
 
 
 playerStyle = {'darkgray': '''
     QMainWindow { background-color: darkgray; }
-    '''
-}
+    '''}
+
 
 class FuzzyDoodlePlayer:
 
@@ -38,7 +33,6 @@ class FuzzyDoodlePlayer:
         self.ui.importAction.triggered.connect(self.importFile)
         self.ui.importDirAction.triggered.connect(self.importDir)
 
-
     def playPauseButtonAction(self):
         imageCount = len(self.imageList)
         if imageCount > 0:
@@ -53,7 +47,7 @@ class FuzzyDoodlePlayer:
 
             self.ui.mainPictureWidget.enableBlurFade(False)
 
-            if self.playState == False:
+            if self.playState is False:
                 self.loadImage(self.imageList.getImage())
                 self.playState = True
         else:
@@ -62,27 +56,25 @@ class FuzzyDoodlePlayer:
             self.ui.nextButton.setEnabled(False)
             self.ui.mainPictureWidget.enableBlurFade(True)
 
-
     def loadImage(self, imageFile):
         image = QImage(imageFile)
         self.ui.mainPicturePixmap.convertFromImage(image)
 
         print('PicturePixmap.size: '
-                + str(self.ui.mainPicturePixmap.width())
-                + ' x '
-                + str(self.ui.mainPicturePixmap.height()))
+              + str(self.ui.mainPicturePixmap.width())
+              + ' x '
+              + str(self.ui.mainPicturePixmap.height()))
 
         print('PictureLabel.size: '
-                + str(self.ui.mainPictureWidget.width())
-                + ' x '
-                + str(self.ui.mainPictureWidget.height()))
+              + str(self.ui.mainPictureWidget.width())
+              + ' x '
+              + str(self.ui.mainPictureWidget.height()))
 
         self.ui.mainPictureWidget.setPixmap(self.ui.mainPicturePixmap)
         self.ui.titleLabel.setText(imageFile)
 
-
     def backButtonAction(self):
-        if len(self.imageList) <= 0 or self.playState == False:
+        if len(self.imageList) <= 0 or self.playState is False:
             return
 
         self.loadImage(self.imageList.getPrevImage())
@@ -90,16 +82,14 @@ class FuzzyDoodlePlayer:
         hasHistory = self.imageList.hasHistory()
         self.ui.backButton.setEnabled(hasHistory)
 
-
     def nextButtonAction(self):
-        if len(self.imageList) <= 0 or self.playState == False:
+        if len(self.imageList) <= 0 or self.playState is False:
             return
 
         self.loadImage(self.imageList.getNextImage())
 
         hasHistory = self.imageList.hasHistory()
         self.ui.backButton.setEnabled(hasHistory)
-
 
     def importDir(self):
         dirName = QFileDialog.getExistingDirectory(
@@ -116,7 +106,6 @@ class FuzzyDoodlePlayer:
 
         print(self.imageList)
 
-
     def importFile(self):
         imageFile, _ = QFileDialog.getOpenFileName(
             self.ui, 'Open File', QDir.currentPath())
@@ -130,20 +119,9 @@ class FuzzyDoodlePlayer:
 
         print(self.imageList)
 
-
     def dispImportMsg(self, count):
         if count > 0:
             importMsg = 'Imported {0} images'.format(count)
         else:
             importMsg = 'No images imported.'
         self.ui.statusBar.showMessage(importMsg)
-
-
-
-
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = FuzzyDoodlePlayer()
-    mainWin.ui.show()
-    sys.exit(app.exec_())

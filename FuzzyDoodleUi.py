@@ -1,10 +1,10 @@
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QLabel, QGridLayout,
-                             QAction, QHBoxLayout,
-                             QPushButton, QSizePolicy, QWidget)
-from PyQt5.QtCore import QDir, QSize
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import (QMainWindow, QLabel, QGridLayout, QAction,
+                             QPushButton, QSizePolicy, QWidget, QHBoxLayout)
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPixmap
 from ImageScaleWidget import ImageScaleWidget
+
 
 class FuzzyDoodleUi(QMainWindow):
 
@@ -21,15 +21,13 @@ class FuzzyDoodleUi(QMainWindow):
         # Inform user that we're ready for use
         self.statusBar.showMessage('Ready!')
 
-
     def initWindow(self):
         screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
         requestedSize = QSize(screenGeometry.width()*2/3,
-                                screenGeometry.height()*2/3)
+                              screenGeometry.height()*2/3)
         self.setMinimumSize(320, 320)
         self.resize(requestedSize)
         self.setWindowTitle('Fuzzy Doodle Sketch Practice')
-
 
     def initBody(self):
         # Setup central grid layout
@@ -47,7 +45,6 @@ class FuzzyDoodleUi(QMainWindow):
         mainGridLayout.addWidget(self.titleLabel, 1, 1)
         mainGridLayout.addLayout(self.buttonLayout, 2, 1)
 
-
     def initPictureFrame(self):
         # Create Title Label
         self.titleLabel = QLabel('Fuzzy Doodle Sketch Practice', self)
@@ -61,7 +58,6 @@ class FuzzyDoodleUi(QMainWindow):
         self.mainPictureWidget.scaleFactor = 1.0
         self.mainPictureWidget.setAlignment(QtCore.Qt.AlignCenter)
 
-
     def initBodyButtons(self):
         # Create back button
         self.backButton = QPushButton('Back', self)
@@ -72,7 +68,8 @@ class FuzzyDoodleUi(QMainWindow):
         # Create pause/play button
         self.playPauseButton = QPushButton('Play', self)
         self.playPauseButton.setToolTip('Start/continue practice session')
-        self.playPauseButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.playPauseButton.setSizePolicy(QSizePolicy.Minimum,
+                                           QSizePolicy.Fixed)
         self.playPauseButton.setEnabled(False)
 
         # Create next button
@@ -86,7 +83,6 @@ class FuzzyDoodleUi(QMainWindow):
         self.buttonLayout.addWidget(self.backButton)
         self.buttonLayout.addWidget(self.playPauseButton)
         self.buttonLayout.addWidget(self.nextButton)
-
 
     def initMenuBar(self):
         # Initialize menu bar
