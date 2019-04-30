@@ -1,7 +1,6 @@
-from PyQt5 import Qt
-from PyQt5.QtCore import QRectF, QPoint
-from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsBlurEffect
+
 
 class GraphicsBlurFadeEffect(QGraphicsBlurEffect):
     def __init__(self, parent):
@@ -14,5 +13,5 @@ class GraphicsBlurFadeEffect(QGraphicsBlurEffect):
         bounds = self.boundingRect()
         super().draw(painter)
         painter.save()
-        painter.fillRect(bounds, QColor(128,128,128,128))
+        painter.fillRect(bounds, QColor(128, 128, 128, 128))
         painter.restore()

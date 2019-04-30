@@ -1,4 +1,6 @@
-import random, os
+import random
+import os
+
 
 class ImagePlaylist:
     def __init__(self):
@@ -6,7 +8,7 @@ class ImagePlaylist:
         self.__randomList = []
         self.__history = []
         self.__nextImage = 0
-        self.__index = 0         # __index goes backward (i.e. negative) into history
+        self.__index = 0  # __index goes backward (i.e. negative) into history
         self.supportedExtensions = ['.jpg', '.jpeg', '.png', '.tiff', '.bmp']
 
     # def loadImagePlayList(self, imageListFile)
@@ -19,7 +21,6 @@ class ImagePlaylist:
             additions += self.appendImage(image)
         return additions
 
-
     def appendImage(self, image):
         if os.path.isfile(image):
             dir, file = os.path.split(image)
@@ -28,10 +29,9 @@ class ImagePlaylist:
         else:
             return 0
 
-
     def __appendImageFile(self, dir, file):
         entry = (dir, file)
-        if (file.endswith(tuple(self.supportedExtensions)) and entry not in self.__imageList) :
+        if file.endswith(tuple(self.supportedExtensions)) and entry not in self.__imageList:
             self.__imageList.append(entry)
             if self.__index == 0:
                 self.__index = -1
@@ -39,7 +39,6 @@ class ImagePlaylist:
             return 1
         else:
             return 0
-
 
     def appendDirectory(self, dir):
         if (dir != '' and os.path.isdir(dir)):
@@ -50,7 +49,6 @@ class ImagePlaylist:
         else:
             return 0
 
-
     def removeImage(self, image):
         if image is int:
             return self.__imageList.pop(image)
@@ -59,11 +57,9 @@ class ImagePlaylist:
             if index >= 0:
                 return self.__imageList.pop(index)
 
-
     def removeImages(self, indicies):
         for index in indicies:
             self.removeImage(index)
-
 
     def getRandomImage(self):
         self.__index = -1
@@ -86,7 +82,6 @@ class ImagePlaylist:
 
         return self.getImage()
 
-
     def getNextImage(self):
         if self.__index < -1:
             self.__index += 1
@@ -95,7 +90,6 @@ class ImagePlaylist:
             next %= len(self.__imageList)
             self.__history.append(next)
         return self.getImage()
-
 
     def getPrevImage(self):
         histLen = len(self.__history)
